@@ -110,6 +110,41 @@ def sense_probability(cell, evidence):
 
     return prob
 
+def normalize(belief):
+    total = sum(belief.values())
+
+    for cell in belief:
+        belief[cell] /= total
+
+    return belief
+
+
+def filtering(belief, evidence):
+    updated = {}
+
+    for cell in FREE_CELLS:
+        likelihood = sense_probability(cell, evidence)
+        updated[cell] = belief[cell] * likelihood
+
+    return normalize(updated)
+
+def prediction(belief, action):
+    new_belief = {cell: 0.0 for cell in FREE_CELLS}
+
+    for cell in FREE_CELLS:
+        r, c = cell
+        current_prob = belief[cell]
+
+        forward = move(r, c, action)
+        left = move(r, c, LEFT[action])
+        right = move(r, c, RIGHT[action])
+
+        new_belief[forward] += current_prob * 0.75
+        new_belief[left] += current_prob * 0.15
+        new_belief[right] += current_prob * 0.10
+
+    return new_belief
+
 def print_grid(title, belief):
     print(title)
 
@@ -129,10 +164,13 @@ def main():
     belief = initialize_belief()
     print_grid("Initial Location Probabilities", belief)
 
-    test_cell = (2, 2)
-    test_evidence = [0, 0, 0, 0]
-    print(f"Sensor likelihood at {test_cell} for {test_evidence}:",
-          sense_probability(test_cell, test_evidence))
+    evidence = [0, 0, 0, 0]
+    belief = filtering(belief, evidence)
+    print_grid(f"Filtering after Evidence {evidence}", belief)
+
+    action = "N"
+    belief = prediction(belief, action)
+    print_grid(f"Prediction after Action {action}", belief)
 
 if __name__ == "__main__":
     main()
