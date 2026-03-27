@@ -22,6 +22,18 @@ GRID = [
     [0, 1, 1, 1, 0, 0, 0],
 ]
 
+STEPS = [
+    ("sense", [0, 0, 0, 0]),
+    ("move", "N"),
+    ("sense", [0, 0, 1, 0]),
+    ("move", "N"),
+    ("sense", [0, 1, 1, 0]),
+    ("move", "W"),
+    ("sense", [0, 1, 0, 0]),
+    ("move", "S"),
+    ("sense", [0, 0, 0, 0]),
+]
+
 
 def is_valid(r, c):
     return 0 <= r < ROWS and 0 <= c < COLS
@@ -164,13 +176,14 @@ def main():
     belief = initialize_belief()
     print_grid("Initial Location Probabilities", belief)
 
-    evidence = [0, 0, 0, 0]
-    belief = filtering(belief, evidence)
-    print_grid(f"Filtering after Evidence {evidence}", belief)
+    for step_type, value in STEPS:
+        if step_type == "sense":
+            belief = filtering(belief, value)
+            print_grid(f"Filtering after Evidence {value}", belief)
 
-    action = "N"
-    belief = prediction(belief, action)
-    print_grid(f"Prediction after Action {action}", belief)
+        elif step_type == "move":
+            belief = prediction(belief, value)
+            print_grid(f"Prediction after Action {value}", belief)
 
 if __name__ == "__main__":
     main()
