@@ -86,6 +86,29 @@ def initialize_belief():
 
     return belief
 
+def sense_probability(cell, evidence):
+    """
+    Returns P(evidence | cell)
+    Evidence order: [W, N, E, S]
+    """
+    r, c = cell
+    directions = ["W", "N", "E", "S"]
+
+    prob = 1.0
+
+    for i in range(4):
+        d = directions[i]
+        obs = evidence[i]
+
+        dr, dc = DIRS[d]
+        has_wall = is_obstacle(r + dr, c + dc)
+
+        if has_wall:
+            prob *= 0.9 if obs == 1 else 0.1
+        else:
+            prob *= 0.05 if obs == 1 else 0.95
+
+    return prob
 
 def print_grid(title, belief):
     print(title)
@@ -106,9 +129,10 @@ def main():
     belief = initialize_belief()
     print_grid("Initial Location Probabilities", belief)
 
-    print("Sample move from (2, 2) going North:", move(2, 2, "N"))
-    print("Sample move from (0, 0) going North:", move(0, 0, "N"))
-
+    test_cell = (2, 2)
+    test_evidence = [0, 0, 0, 0]
+    print(f"Sensor likelihood at {test_cell} for {test_evidence}:",
+          sense_probability(test_cell, test_evidence))
 
 if __name__ == "__main__":
     main()
