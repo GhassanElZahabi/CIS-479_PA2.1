@@ -44,6 +44,38 @@ def get_free_cells():
 
 FREE_CELLS = get_free_cells()
 
+DIRS = {
+    "N": (-1, 0),
+    "S": (1, 0),
+    "W": (0, -1),
+    "E": (0, 1),
+}
+
+LEFT = {
+    "N": "W",
+    "W": "S",
+    "S": "E",
+    "E": "N",
+}
+
+RIGHT = {
+    "N": "E",
+    "E": "S",
+    "S": "W",
+    "W": "N",
+}
+
+
+def move(r, c, direction):
+    dr, dc = DIRS[direction]
+    nr, nc = r + dr, c + dc
+
+    # If blocked by a wall or obstacle, stay in place
+    if is_obstacle(nr, nc):
+        return (r, c)
+
+    return (nr, nc)
+
 
 def initialize_belief():
     belief = {}
@@ -73,6 +105,9 @@ def print_grid(title, belief):
 def main():
     belief = initialize_belief()
     print_grid("Initial Location Probabilities", belief)
+
+    print("Sample move from (2, 2) going North:", move(2, 2, "N"))
+    print("Sample move from (0, 0) going North:", move(0, 0, "N"))
 
 
 if __name__ == "__main__":
